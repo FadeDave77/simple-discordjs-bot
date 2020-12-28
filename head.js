@@ -37,26 +37,11 @@ client.login(vars.TokenNull);
 // leftover commands
 client.on('message', message => {
     if (message.content.includes('flush')) {
-	if (message.content.includes('<@' && '>')) return;
+	if (message.content.includes('<@' & '>')) return;
         const embed = new MessageEmbed()
         .setTitle(':flushed: FLUSH')
         .setColor(0xff7000)
-        .setDescription(`
-        ⚫⚫⚫⚫⚫😳😳😳😳⚫⚫⚫⚫⚫
-        ⚫⚫⚫😳😳⚫⚫⚫⚫😳😳⚫⚫⚫
-        ⚫⚫😳🟤🟤🟤⚫⚫🟤🟤🟤😳⚫⚫
-        ⚫😳⚫⚫⚪⚪⚫⚫⚪⚪⚫⚫😳⚫
-        ⚫😳⚫⚪🟢🟢⚪⚪🟢🟢⚪⚫😳⚫
-        😳⚫⚫⚪🟢🟢⚪⚪🟢🟢⚪⚫⚫😳
-        😳⚫⚫🔴⚪⚪⚫⚫⚪⚪🔴⚫⚫😳
-        😳⚫🔴🔴🔴🔴⚫⚫🔴🔴🔴🔴⚫😳
-        😳⚫🔴🔴🔴⚫⚫⚫⚫🔴🔴🔴⚫😳
-        ⚫😳⚫🔴⚫⚫⚫⚫⚫⚫🔴⚫😳⚫
-        ⚫😳⚫⚫⚫🟤🟤🟤🟤⚫⚫⚫😳⚫
-        ⚫⚫😳⚫⚫⚫⚫⚫⚫⚫⚫😳⚫⚫
-        ⚫⚫⚫😳😳⚫⚫⚫⚫😳😳⚫⚫⚫
-        ⚫⚫⚫⚫⚫😳😳😳😳⚫⚫⚫⚫⚫
-        `);
+        .setDescription(`⚫⚫⚫⚫⚫😳😳😳😳⚫⚫⚫⚫⚫\n        ⚫⚫⚫😳😳⚫⚫⚫⚫😳😳⚫⚫⚫\n        ⚫⚫😳🟤🟤🟤⚫⚫🟤🟤🟤😳⚫⚫\n        ⚫😳⚫⚫⚪⚪⚫⚫⚪⚪⚫⚫😳⚫\n        ⚫😳⚫⚪🟢🟢⚪⚪🟢🟢⚪⚫😳⚫\n        😳⚫⚫⚪🟢🟢⚪⚪🟢🟢⚪⚫⚫😳\n        😳⚫⚫🔴⚪⚪⚫⚫⚪⚪🔴⚫⚫😳\n        😳⚫🔴🔴🔴🔴⚫⚫🔴🔴🔴🔴⚫😳\n        😳⚫🔴🔴🔴⚫⚫⚫⚫🔴🔴🔴⚫😳\n        ⚫😳⚫🔴⚫⚫⚫⚫⚫⚫🔴⚫😳⚫\n        ⚫😳⚫⚫⚫🟤🟤🟤🟤⚫⚫⚫😳⚫\n        ⚫⚫😳⚫⚫⚫⚫⚫⚫⚫⚫😳⚫⚫\n        ⚫⚫⚫😳😳⚫⚫⚫⚫😳😳⚫⚫⚫\n        ⚫⚫⚫⚫⚫😳😳😳😳⚫⚫⚫⚫⚫`);
         message.channel.send(embed);
     };
 });
@@ -91,3 +76,29 @@ const embed = new MessageEmbed()
     `);
 channel.send(embed);
 });
+
+client.on('message', async message=> {
+    if (message.content.startsWith(';play')) {
+        const args = message.content.split(' ').slice(1);
+        const link = String(args.slice(0, 1));
+        let volpercent = args.slice(1).join(' ');
+        let vol = volpercent/100;
+        const randomColor = "0x" + Math.random().toString(16).slice(2, 8);
+        if (!vol) vol = 1;
+        if (vol > 2) vol = 2;
+        if (!link, link.length == 0) return message.reply('no');
+        if (message.member.voice.channel) {
+            const connection = await message.member.voice.channel.join();
+            if (!ytdl.validateURL(link)) return message.reply('invalid string')
+            const dispatcher = await connection.play(ytdl(`${link}`, {volume: vol}) || connection.play(`${link}`, {volume: vol}));
+            let embed = new MessageEmbed()
+                .setTitle('Music player :musical_note:')
+                .setColor(randomColor)
+                .setDescription(`Now playing ${link}, with \`${vol*100}%\` volume, requested by \`${message.author.tag}\`.`);
+            message.reply(embed);
+        } 
+        else {
+            message.reply('join a voice channel first!');
+        };
+    }
+})
